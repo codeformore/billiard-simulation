@@ -19,6 +19,9 @@ public:
     //Physical Functions
     void update(float deltaT);
 
-    Ball(float radius = 10, float mass = 1);
+    Ball(sf::Vector2<float> init_position = sf::Vector2(0.0f, 0.0f), 
+         sf::Vector2<float> init_velocity = sf::Vector2(0.0f, 0.0f), 
+         sf::Vector2<float> init_acceleration = sf::Vector2(0.0f, 0.0f), 
+         float radius = 10, float mass = 1);
 };
 #endif

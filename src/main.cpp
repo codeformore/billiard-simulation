@@ -25,9 +25,10 @@ int main()
     std::vector<Ball> balls;
     for (int i = 0; i < NUM_BALLS; i++)
     {
-        balls.emplace_back(rand_radius(gen), rand_mass(gen));
-        balls[i].position.x = rand_position(gen); balls[i].position.y = rand_position(gen);
-        balls[i].velocity.x = rand_velocity(gen); balls[i].velocity.y = rand_velocity(gen);
+        balls.emplace_back(sf::Vector2(rand_position(gen), rand_position(gen)),
+                           sf::Vector2(rand_velocity(gen), rand_velocity(gen)),
+                           sf::Vector2(0.0f, 0.0f),
+                           rand_radius(gen), rand_mass(gen));
     }
 
     // run the program as long as the window is open

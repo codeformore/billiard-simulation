@@ -3,19 +3,23 @@
 void Ball::update(float deltaT)
 {
     position = velocity*deltaT + position;
-    shape.setPosition(position);
+    shape.setPosition(position - sf::Vector2(radius, radius));
     velocity = acceleration*deltaT + velocity;
 }
 
-Ball::Ball(float radius, float mass)
+Ball::Ball(sf::Vector2<float> init_position, 
+           sf::Vector2<float> init_velocity, 
+           sf::Vector2<float> init_acceleration, 
+           float radius, float mass)
 {
-    shape = sf::CircleShape(radius);
-    shape.setFillColor(sf::Color(100,250,50));
-
     this->radius = radius;
     this->mass = mass;
-    position = sf::Vector2<float>(0, 0);
-    velocity = sf::Vector2<float>(0, 0);
-    acceleration = sf::Vector2<float>(0, 0);
+    position = init_position;
+    velocity = init_velocity;
+    acceleration = init_acceleration;
+
+    shape = sf::CircleShape(radius);
+    shape.setFillColor(sf::Color(100,250,50));
+    shape.setPosition(position - sf::Vector2(radius, radius));
 }
 
