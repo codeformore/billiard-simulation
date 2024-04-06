@@ -19,6 +19,9 @@ public:
     //Physical Functions
     void update(float deltaT);
 
+    //Static Collision Functions
+    static bool AreColliding(const Ball& ball1, const Ball& ball2);
+
     Ball(sf::Vector2<float> init_position = sf::Vector2(0.0f, 0.0f), 
          sf::Vector2<float> init_velocity = sf::Vector2(0.0f, 0.0f), 
          sf::Vector2<float> init_acceleration = sf::Vector2(0.0f, 0.0f), 

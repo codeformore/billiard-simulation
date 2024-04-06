@@ -4,7 +4,7 @@
 #include <iostream>
 #include "ball.hpp"
 
-const int NUM_BALLS = 50;
+const int NUM_BALLS = 500;
 
 int main()
 {
@@ -14,11 +14,11 @@ int main()
     //Define Distributions
     std::uniform_real_distribution<float> rand_mass(1.0f, 5.0f);
     std::uniform_real_distribution<float> rand_radius(5.0f, 15.0f); 
-    std::uniform_real_distribution<float> rand_position(200.0f, 500.0f);
+    std::uniform_real_distribution<float> rand_position(0.0f, 800.0f);
     std::uniform_real_distribution<float> rand_velocity(-5.0f, 5.0f);
 
     // create the window
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Billiard Simulation");
+    sf::RenderWindow window(sf::VideoMode(800, 800), "Billiard Simulation");
 
     sf::Clock clock;
 
@@ -45,7 +45,24 @@ int main()
 
         float deltaT = clock.restart().asSeconds();
 
-        //Move Shape
+        //Determine Collisions
+        for (int i = 0; i < balls.size(); i++)
+        {
+            for (int j = 0; j < balls.size(); j++)
+            {
+                if (i != j)
+                {
+                    bool collision = Ball::AreColliding(balls[i], balls[j]);
+                    if (collision)
+                    {
+                        balls[i].shape.setFillColor(sf::Color::Red);
+                        balls[j].shape.setFillColor(sf::Color::Red);
+                    }
+                }
+            }
+        }
+
+        //Calculate Physics Updates
         for (auto& ball : balls)
             ball.update(deltaT);
 
@@ -56,6 +73,10 @@ int main()
         // window.draw(...);
         for (auto& ball : balls)
             window.draw(ball.shape);
+
+        //Reset Colors
+        for (auto& ball : balls)
+            ball.shape.setFillColor(sf::Color::Blue);
 
         // end the current frame
         window.display();

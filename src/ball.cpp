@@ -1,10 +1,21 @@
 #include "ball.hpp"
+#include <math.h>
 
 void Ball::update(float deltaT)
 {
     position = velocity*deltaT + position;
     shape.setPosition(position - sf::Vector2(radius, radius));
     velocity = acceleration*deltaT + velocity;
+}
+
+bool Ball::AreColliding(const Ball &ball1, const Ball &ball2)
+{
+    // Calculate distance between circle centers
+    sf::Vector2<float> delta = ball1.position - ball2.position;
+    float distance = std::sqrt(delta.x * delta.x + delta.y * delta.y);
+
+    // Check if circles are colliding
+    return distance < (ball1.radius + ball2.radius);
 }
 
 Ball::Ball(sf::Vector2<float> init_position, 
@@ -19,7 +30,7 @@ Ball::Ball(sf::Vector2<float> init_position,
     acceleration = init_acceleration;
 
     shape = sf::CircleShape(radius);
-    shape.setFillColor(sf::Color(100,250,50));
+    shape.setFillColor(sf::Color::Blue);
     shape.setPosition(position - sf::Vector2(radius, radius));
 }
 
