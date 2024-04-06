@@ -1,12 +1,14 @@
 #include <SFML/Graphics.hpp>
+#include "ball.hpp"
 
 int main()
 {
     // create the window
     sf::RenderWindow window(sf::VideoMode(800, 600), "Billiard Simulation");
 
-    sf::CircleShape shape(50.f);
-    shape.setFillColor(sf::Color(100,250,50));
+    float deltaT = 0.1;
+    Ball myBall;
+    myBall.velocity.x = 3; myBall.velocity.y = 3;
 
     // run the program as long as the window is open
     while (window.isOpen())
@@ -21,14 +23,14 @@ int main()
         }
 
         //Move Shape
-        shape.move(0.1f,0.1f);
+        myBall.update(0.01);
 
         // clear the window with black color
         window.clear(sf::Color::Black);
 
         // draw everything here...
         // window.draw(...);
-        window.draw(shape);
+        window.draw(myBall.shape);
 
         // end the current frame
         window.display();
