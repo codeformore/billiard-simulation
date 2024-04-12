@@ -1,11 +1,13 @@
 #include "ball.hpp"
 #include <math.h>
+//Debug
+#include <iostream>
 
 void Ball::update(float deltaT)
 {
     position = velocity*deltaT + position;
     shape.setPosition(position - sf::Vector2(radius, radius));
-    velocity = acceleration*deltaT + velocity;
+    // velocity = acceleration*deltaT + velocity;
 }
 
 bool Ball::AreColliding(const Ball &ball1, const Ball &ball2)
@@ -16,6 +18,18 @@ bool Ball::AreColliding(const Ball &ball1, const Ball &ball2)
 
     // Check if circles are colliding
     return distance < (ball1.radius + ball2.radius);
+}
+
+void Ball::CalculateElasticCollision(Ball& ball1, Ball& ball2)
+{
+    sf::Vector2<float> velocity_difference = ball1.velocity - ball2.velocity;
+    sf::Vector2<float> position_difference = ball1.position - ball2.position;
+    float difference_dot = velocity_difference.x*position_difference.x + velocity_difference.y*position_difference.y;
+    float difference_norm_squared = position_difference.x*position_difference.x + position_difference.y*position_difference.y;
+    float mass_term = 2 / (ball1.mass + ball2.mass);
+    ball1.velocity -= (ball2.mass * mass_term * difference_dot / difference_norm_squared) * position_difference;
+    ball2.velocity += (ball1.mass * mass_term * difference_dot / difference_norm_squared) * position_difference;
+    // std::cout << "Collision: " << mass_term * difference_dot / difference_norm_squared << std::endl;
 }
 
 Ball::Ball(sf::Vector2<float> init_position, 

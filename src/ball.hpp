@@ -21,6 +21,7 @@ public:
 
     //Static Collision Functions
     static bool AreColliding(const Ball& ball1, const Ball& ball2);
+    static void CalculateElasticCollision(Ball& ball1, Ball& ball2);
 
     Ball(sf::Vector2<float> init_position = sf::Vector2(0.0f, 0.0f), 
          sf::Vector2<float> init_velocity = sf::Vector2(0.0f, 0.0f), 
