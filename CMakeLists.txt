@@ -10,7 +10,7 @@ FetchContent_Declare(SFML
     GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(BilliardSimulation src/main.cpp src/ball.cpp)
+add_executable(BilliardSimulation src/main.cpp src/ball.cpp src/quadTree.cpp)
 target_link_libraries(BilliardSimulation PRIVATE sfml-graphics)
 target_compile_features(BilliardSimulation PRIVATE cxx_std_17)
 
