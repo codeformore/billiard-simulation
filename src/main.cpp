@@ -120,7 +120,18 @@ int main()
                 {
                     balls[i].shape.setFillColor(sf::Color::Red);
                     balls[nearbyBall].shape.setFillColor(sf::Color::Red);
+                    sf::Vector2<float> prev_momentum = balls[i].velocity*balls[i].mass + balls[nearbyBall].velocity*balls[nearbyBall].mass;
                     Ball::CalculateElasticCollision(balls[i], balls[nearbyBall]);
+                    //Simple Sticking Fix. Not accurate.
+                    while (Ball::AreColliding(balls[i], balls[nearbyBall]))
+                    {
+                        balls[i].update(deltaT); balls[nearbyBall].update(deltaT);
+                    }
+                    sf::Vector2<float> after_momentum = balls[i].velocity*balls[i].mass + balls[nearbyBall].velocity*balls[nearbyBall].mass;
+                    sf::Vector2<float> diff_momentum = after_momentum - prev_momentum;
+                    float diff_momentum_norm_squared = diff_momentum.x*diff_momentum.x + diff_momentum.y*diff_momentum.y;
+                    if (diff_momentum_norm_squared > 1e-5)
+                        std::cout << "ERROR: Momentum Not Conserved: " << diff_momentum_norm_squared << std::endl;
                 }
             }
         }
@@ -128,9 +139,9 @@ int main()
         //Keep inside of screen collision detection
         for (auto& ball : balls)
         {
-            if (ball.position.x + ball.radius < boundary.topLeft.x || ball.position.x - ball.radius > boundary.topLeft.x + boundary.width)
+            if (ball.position.x - ball.radius < boundary.topLeft.x || ball.position.x + ball.radius > boundary.topLeft.x + boundary.width)
                 ball.velocity.x = -ball.velocity.x; 
-            if (ball.position.y + ball.radius < boundary.topLeft.y || ball.position.y - ball.radius > boundary.topLeft.y + boundary.height)
+            if (ball.position.y - ball.radius < boundary.topLeft.y || ball.position.y + ball.radius > boundary.topLeft.y + boundary.height)
                 ball.velocity.y = -ball.velocity.y;
         }
 
