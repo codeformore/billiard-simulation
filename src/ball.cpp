@@ -29,7 +29,6 @@ void Ball::CalculateElasticCollision(Ball& ball1, Ball& ball2)
     float mass_term = 2 / (ball1.mass + ball2.mass);
     ball1.velocity -= (ball2.mass * mass_term * difference_dot / difference_norm_squared) * position_difference;
     ball2.velocity += (ball1.mass * mass_term * difference_dot / difference_norm_squared) * position_difference;
-    // std::cout << "Collision: " << mass_term * difference_dot / difference_norm_squared << std::endl;
 }
 
 Ball::Ball(sf::Vector2<float> init_position, 

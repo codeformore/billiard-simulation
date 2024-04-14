@@ -3,8 +3,10 @@
 #include <random>
 #include <iostream>
 #include "ball.hpp"
+#include "quadTree.hpp"
 
-const int NUM_BALLS = 50;
+const int NUM_BALLS = 25;
+const int MAX_NUM_TRIES = 5;
 
 int main()
 {
@@ -22,15 +24,34 @@ int main()
 
     sf::Clock clock;
 
-    //Random Balls Test
+    //NEW VECTOR METHOD
+    Rectangle boundary = {sf::Vector2<float>(0.0f, 0.0f), 800, 800};
+    QuadTree qTree(boundary);
     std::vector<Ball> balls;
-    for (int i = 0; i < NUM_BALLS; i++)
+    bool found_free_space = true;
+    for (int i = 0; i < NUM_BALLS && found_free_space; i++)
     {
-        balls.emplace_back(sf::Vector2(rand_position(gen) + 200, rand_position(gen) + 200),
-                           sf::Vector2(rand_velocity(gen), rand_velocity(gen)),
-                           sf::Vector2(0.0f, 0.0f),
-                           rand_radius(gen), rand_mass(gen));
+        int tries = 0;
+        sf::Vector2<float> position_candidate;
+        float radius_candidate;
+        found_free_space = false;
+        while (tries < MAX_NUM_TRIES && !found_free_space)
+        {
+            position_candidate = sf::Vector2(rand_position(gen) + 200, rand_position(gen) + 200);
+            radius_candidate = rand_radius(gen);
+            Ball test_ball = Ball(position_candidate, sf::Vector2(0.0f, 0.0f), sf::Vector2(0.0f, 0.0f), radius_candidate, 1.0f);
+            found_free_space = true;
+            for (const auto& ball : balls)
+                found_free_space &= !Ball::AreColliding(ball, test_ball);
+            if (found_free_space)
+                balls.emplace_back(position_candidate,
+                                sf::Vector2(rand_velocity(gen), rand_velocity(gen)),
+                                sf::Vector2(0.0f, 0.0f),
+                                radius_candidate, rand_mass(gen));
+            tries++;
+        }
     }
+
 
     //Four Corners Test
     // balls.emplace_back(sf::Vector2(500.0f,500.0f),
@@ -65,19 +86,42 @@ int main()
         float deltaT = clock.restart().asSeconds();
 
         //Determine Collisions
-        for (int i = 1; i < balls.size(); i++)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                if (i != j)
-                {
-                    if (Ball::AreColliding(balls[i], balls[j]))
-                    {
-                        balls[i].shape.setFillColor(sf::Color::Red);
-                        balls[j].shape.setFillColor(sf::Color::Red);
-                        Ball::CalculateElasticCollision(balls[i], balls[j]);
-                        // balls[i].update(deltaT); balls[j].update(deltaT);
-                    }
+        //SLOW
+        // for (int i = 1; i < balls.size(); i++)
+        // {
+        //     for (int j = 0; j < i; j++)
+        //     {
+        //         if (i != j)
+        //         {
+        //             if (Ball::AreColliding(balls[i], balls[j]))
+        //             {
+        //                 balls[i].shape.setFillColor(sf::Color::Red);
+        //                 balls[j].shape.setFillColor(sf::Color::Red);
+        //                 Ball::CalculateElasticCollision(balls[i], balls[j]);
+        //                 // balls[i].update(deltaT); balls[j].update(deltaT);
+        //             }
+        //         }
+        //     }
+        // }
+
+        //FAST
+        //Update Quad Tree
+        qTree.Clear();
+        for (int i = 0; i < balls.size(); i++)
+            qTree.Insert(balls[i].position, balls[i].radius, i);
+        //Perform Collision Detection
+        int count = 0;
+        for (int i = 0; i < balls.size(); i++) {
+            // Query nearby balls within a certain range
+            BallCollisionBox range = {balls[i].position, balls[i].radius, i}; // Adjust the range as needed
+            std::vector<BallCollisionBox> nearbyBalls = qTree.QueryRange(range);
+
+            // Check for collisions with nearby balls
+            for (const auto& nearbyBall : nearbyBalls) {
+                if (i != nearbyBall.ball_num && Ball::AreColliding(balls[i], balls[nearbyBall.ball_num])) {
+                    // Perform collision response and update velocities
+                    Ball::CalculateElasticCollision(balls[i], balls[nearbyBall.ball_num]);
+                    count++;
                 }
             }
         }
@@ -91,6 +135,7 @@ int main()
 
         // draw everything here...
         // window.draw(...);
+        qTree.Draw(window);
         for (auto& ball : balls)
             window.draw(ball.shape);
 
