@@ -5,7 +5,7 @@
 #include "ball.hpp"
 #include "quadTree.hpp"
 
-const int NUM_BALLS = 100;
+const int NUM_BALLS = 250;
 const int MAX_NUM_TRIES = 5;
 
 int main()
@@ -123,6 +123,15 @@ int main()
                     Ball::CalculateElasticCollision(balls[i], balls[nearbyBall]);
                 }
             }
+        }
+
+        //Keep inside of screen collision detection
+        for (auto& ball : balls)
+        {
+            if (ball.position.x + ball.radius < boundary.topLeft.x || ball.position.x - ball.radius > boundary.topLeft.x + boundary.width)
+                ball.velocity.x = -ball.velocity.x; 
+            if (ball.position.y + ball.radius < boundary.topLeft.y || ball.position.y - ball.radius > boundary.topLeft.y + boundary.height)
+                ball.velocity.y = -ball.velocity.y;
         }
 
         //Calculate Physics Updates
