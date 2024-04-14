@@ -39,8 +39,8 @@ public:
     // Insert a ball into the quad tree
     void Insert(sf::Vector2<float> position, float radius, int ball_num);
 
-    // Query nearby balls within a given range
-    std::vector<BallCollisionBox> QueryRange(const BallCollisionBox& range);
+    // Query nearby balls within ball number
+    std::vector<int> QueryRange(sf::Vector2<float> center, float radius, int ball_num);
 
     //Clear the QuadTree
     void Clear();
@@ -56,7 +56,7 @@ private:
     bool contains(const BallCollisionBox& ball);
 
     // Helper function for querying nearby balls recursively
-    void queryRangeHelper(const BallCollisionBox& range, std::vector<BallCollisionBox>& foundBalls);
+    void queryRangeHelper(const BallCollisionBox& range, std::vector<int>& foundBalls);
 
     // Check if the node's boundary intersects with a given range
     bool boundaryIntersects(const BallCollisionBox& range);

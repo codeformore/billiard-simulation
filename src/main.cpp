@@ -5,7 +5,7 @@
 #include "ball.hpp"
 #include "quadTree.hpp"
 
-const int NUM_BALLS = 25;
+const int NUM_BALLS = 100;
 const int MAX_NUM_TRIES = 5;
 
 int main()
@@ -110,18 +110,17 @@ int main()
         for (int i = 0; i < balls.size(); i++)
             qTree.Insert(balls[i].position, balls[i].radius, i);
         //Perform Collision Detection
-        int count = 0;
         for (int i = 0; i < balls.size(); i++) {
             // Query nearby balls within a certain range
-            BallCollisionBox range = {balls[i].position, balls[i].radius, i}; // Adjust the range as needed
-            std::vector<BallCollisionBox> nearbyBalls = qTree.QueryRange(range);
+            std::vector<int> nearbyBalls = qTree.QueryRange(balls[i].position, balls[i].radius, i);
 
-            // Check for collisions with nearby balls
+            // Calculate collisions for found balls
             for (const auto& nearbyBall : nearbyBalls) {
-                if (i != nearbyBall.ball_num && Ball::AreColliding(balls[i], balls[nearbyBall.ball_num])) {
-                    // Perform collision response and update velocities
-                    Ball::CalculateElasticCollision(balls[i], balls[nearbyBall.ball_num]);
-                    count++;
+                if (nearbyBall > i)
+                {
+                    balls[i].shape.setFillColor(sf::Color::Red);
+                    balls[nearbyBall].shape.setFillColor(sf::Color::Red);
+                    Ball::CalculateElasticCollision(balls[i], balls[nearbyBall]);
                 }
             }
         }

@@ -1,5 +1,6 @@
 #include "quadTree.hpp"
 #include <iostream>
+#include <algorithm>
 #include <cmath>
 
 // Subdivide the node into four child nodes
@@ -41,9 +42,10 @@ void QuadTree::Insert(sf::Vector2<float> position, float radius, int ball_num) {
 }
 
 // Query nearby balls within a given range
-std::vector<BallCollisionBox> QuadTree::QueryRange(const BallCollisionBox& range) {
-    std::vector<BallCollisionBox> foundBalls;
-    queryRangeHelper(range, foundBalls);
+std::vector<int> QuadTree::QueryRange(sf::Vector2<float> center, float radius, int ball_num) {
+    std::vector<int> foundBalls;
+    BallCollisionBox test = {center, radius, ball_num};
+    queryRangeHelper(test, foundBalls);
     return foundBalls;
 }
 
@@ -73,13 +75,15 @@ bool QuadTree::contains(const BallCollisionBox& ball) {
 }
 
 // Helper function for querying nearby balls recursively
-void QuadTree::queryRangeHelper(const BallCollisionBox& range, std::vector<BallCollisionBox>& foundBalls) {
+void QuadTree::queryRangeHelper(const BallCollisionBox& range, std::vector<int>& foundBalls) {
     if (!boundaryIntersects(range)) {
         return;
     }
     for (const auto& ball : Balls) {
-        if (ballIntersectsRange(ball, range)) {
-            foundBalls.push_back(ball);
+        if (ball.ball_num != range.ball_num && ballIntersectsRange(ball, range)) {
+            auto it = std::find(foundBalls.begin(), foundBalls.end(), ball.ball_num);
+            if (it == foundBalls.end())
+                foundBalls.push_back(ball.ball_num);
         }
     }
     if (Divided) {
