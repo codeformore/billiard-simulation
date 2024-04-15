@@ -86,7 +86,7 @@ int main()
         float deltaT = clock.restart().asSeconds();
 
         //Determine Collisions
-        //SLOW
+        //SLOW: Check all pairs
         // for (int i = 1; i < balls.size(); i++)
         // {
         //     for (int j = 0; j < i; j++)
@@ -104,7 +104,7 @@ int main()
         //     }
         // }
 
-        //FAST
+        //FAST: Quadtree
         //Update Quad Tree
         qTree.Clear();
         for (int i = 0; i < balls.size(); i++)
@@ -122,10 +122,11 @@ int main()
                     balls[nearbyBall].shape.setFillColor(sf::Color::Red);
                     sf::Vector2<float> prev_momentum = balls[i].velocity*balls[i].mass + balls[nearbyBall].velocity*balls[nearbyBall].mass;
                     Ball::CalculateElasticCollision(balls[i], balls[nearbyBall]);
-                    //Simple Sticking Fix. Not accurate.
+                    //Simple Sticking Fix. Not physically accurate.
                     while (Ball::AreColliding(balls[i], balls[nearbyBall]))
                     {
-                        balls[i].update(deltaT); balls[nearbyBall].update(deltaT);
+                        balls[i].update(deltaT); 
+                        balls[nearbyBall].update(deltaT);
                     }
                     sf::Vector2<float> after_momentum = balls[i].velocity*balls[i].mass + balls[nearbyBall].velocity*balls[nearbyBall].mass;
                     sf::Vector2<float> diff_momentum = after_momentum - prev_momentum;

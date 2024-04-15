@@ -1,7 +1,5 @@
 #include "ball.hpp"
 #include <math.h>
-//Debug
-#include <iostream>
 
 void Ball::update(float deltaT)
 {
